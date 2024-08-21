@@ -2,7 +2,7 @@ import User from "../models/user.model.js";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-export const register = async (req, res) => {
+export const signup = async (req, res) => {
   const { username, password } = req.body;
   try {
     const userDoc = await User.create({
@@ -15,7 +15,7 @@ export const register = async (req, res) => {
   }
 };
 
-export const login = async (req, res) => {
+export const signin = async (req, res) => {
   const { username, password } = req.body;
   const userDoc = await User.findOne({ username });
 
@@ -28,7 +28,8 @@ export const login = async (req, res) => {
       {},
       (err, token) => {
         if (err) throw err;
-        res.cookie("access_token", token).json({
+
+        res.cookie("_blog_token", token).json({
           id: userDoc._id,
           username,
         });
@@ -39,13 +40,17 @@ export const login = async (req, res) => {
   }
 };
 
-export const logout = (req, res) => {
-  res.cookie("access_token", "").json("ok");
+export const logout = (req, res, next) => {
+  try {
+    res.clearCookie("_blog_token").status(200).json("User has been signed out");
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const profile = (req, res) => {
-  const { token } = req.cookies;
-  jwt.verify(token, process.env.JWT_SECRET, {}, (err, info) => {
+  const { _blog_token } = req.cookies;
+  jwt.verify(_blog_token, process.env.JWT_SECRET, {}, (err, info) => {
     if (err) throw err;
     res.json(info);
   });
