@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const conn = () => {
   try {
@@ -13,4 +13,4 @@ const conn = () => {
   }
 };
 
-module.exports = conn;
+export default conn;
