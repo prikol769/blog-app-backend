@@ -28,7 +28,7 @@ export const login = async (req, res) => {
       {},
       (err, token) => {
         if (err) throw err;
-        res.cookie("token", token).json({
+        res.cookie("access_token", token).json({
           id: userDoc._id,
           username,
         });
@@ -40,7 +40,7 @@ export const login = async (req, res) => {
 };
 
 export const logout = (req, res) => {
-  res.cookie("token", "").json("ok");
+  res.cookie("access_token", "").json("ok");
 };
 
 export const profile = (req, res) => {
