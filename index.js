@@ -3,12 +3,14 @@ const cors = require("cors");
 const conn = require("./db/conn");
 const app = express();
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const User = require("./models/user.model");
 require("dotenv").config();
 
 const salt = bcrypt.genSaltSync(10);
+const secret = "asdsadsa5dsa5d5as45d4as4d5";
 
-app.use(cors());
+app.use(cors({ credentials: true, origin: "http://localhost:5173" }));
 app.use(express.json());
 
 const PORT = process.env.PORT;
@@ -34,11 +36,17 @@ app.post("/login", async (req, res) => {
   console.log(userDoc, "userDoc");
 
   const passOk = bcrypt.compareSync(password, userDoc.password);
-  res.json(passOk);
   if (passOk) {
-    //logged in
+    // logged in
+    jwt.sign({ username, id: userDoc._id }, secret, {}, (err, token) => {
+      if (err) throw err;
+      res.cookie("token", token).json({
+        id: userDoc._id,
+        username,
+      });
+    });
   } else {
-    res.status(400).json("Wrong credentials");
+    res.status(400).json("wrong credentials");
   }
 });
 
