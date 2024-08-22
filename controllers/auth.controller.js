@@ -1,42 +1,58 @@
 import User from "../models/user.model.js";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { errorHandler } from "../utils/errorHandler.js";
 
-export const signup = async (req, res) => {
+export const signup = async (req, res, next) => {
   const { username, password } = req.body;
+
+  if (!username || !password || username === "" || password === "") {
+    next(errorHandler(400, "All fields are required"));
+  }
+  const newUser = new User({
+    username,
+    password: bcryptjs.hashSync(password, 10),
+  });
+
   try {
-    const userDoc = await User.create({
-      username,
-      password: bcryptjs.hashSync(password, 10),
-    });
-    res.json(userDoc);
-  } catch (err) {
-    res.status(400).json(err);
+    await newUser.save();
+    res.json("Signup successful");
+  } catch (error) {
+    next(error);
   }
 };
 
-export const signin = async (req, res) => {
+export const signin = async (req, res, next) => {
   const { username, password } = req.body;
-  const userDoc = await User.findOne({ username });
 
-  const passOk = bcryptjs.compareSync(password, userDoc.password);
-  if (passOk) {
-    // logged in
-    jwt.sign(
-      { username, id: userDoc._id },
-      process.env.JWT_SECRET,
-      {},
-      (err, token) => {
-        if (err) throw err;
+  if (!username || !password || username === "" || password === "") {
+    return next(errorHandler(400, "All fields are required"));
+  }
 
-        res.cookie("_blog_token", token).json({
-          id: userDoc._id,
-          username,
-        });
-      }
+  try {
+    const validUser = await User.findOne({ username });
+
+    if (!validUser) {
+      return next(errorHandler(404, "User not found"));
+    }
+    const validPassword = bcryptjs.compareSync(password, validUser.password);
+    if (!validPassword) {
+      return next(errorHandler(400, "Invalid email or password"));
+    }
+
+    const { password: pass, ...rest } = validUser._doc;
+
+    const token = jwt.sign(
+      {
+        id: validUser._id,
+        username: validUser.username,
+      },
+      process.env.JWT_SECRET
     );
-  } else {
-    res.status(400).json("wrong credentials");
+
+    res.status(200).cookie("_blog_token", token).json(rest);
+  } catch (error) {
+    next(error);
   }
 };
 
