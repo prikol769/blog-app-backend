@@ -4,6 +4,7 @@ import conn from "./db/conn.js";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import authRoutes from "./routes/auth.route.js";
+import postRoutes from "./routes/post.route.js";
 
 dotenv.config();
 const PORT = process.env.PORT;
@@ -21,11 +22,11 @@ app.listen(PORT, () => {
 conn();
 
 app.use("/api/auth", authRoutes);
+app.use("/api/posts", postRoutes);
 
 app.get("/", (req, res) => {
   res.send("Home");
 });
-
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
