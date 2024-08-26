@@ -1,19 +1,28 @@
 import Post from "../models/post.model.js";
+import User from "../models/user.model.js";
 import { errorHandler } from "../utils/errorHandler.js";
 
 export const create = async (req, res, next) => {
-  if (!req.body.title || !req.body.content) {
+  const { title, content, category, summary } = req.body;
+  if (!title || !content || !category || !summary) {
     return next(errorHandler(400, "Please provide all required fields"));
   }
 
-  const newPost = new Post({
-    ...req.body,
-    userId: req.user.id,
-  });
-
-  console.log(newPost, "newPost");
-
   try {
+    const isUserExist = await User.findOne({
+      _id: req.user.id,
+    });
+
+    if (!isUserExist) {
+      return next(errorHandler(400, "Can`t find a user!"));
+    }
+
+    const newPost = new Post({
+      ...req.body,
+      userId: req.user.id,
+      author: isUserExist.fullName,
+    });
+
     const savedPost = await newPost.save();
     res.status(201).json(savedPost);
   } catch (error) {
