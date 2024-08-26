@@ -26,6 +26,10 @@ const postSchema = new mongoose.Schema(
       required: true,
       maxLength: 15,
     },
+    author: {
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true }
 );
