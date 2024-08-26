@@ -4,21 +4,46 @@ import jwt from "jsonwebtoken";
 import { errorHandler } from "../utils/errorHandler.js";
 
 export const signup = async (req, res, next) => {
-  const { username, password } = req.body;
+  const { username, email, fullName, password } = req.body;
 
-  if (!username || !password || username === "" || password === "") {
+  if (
+    !username ||
+    !password ||
+    !email ||
+    !fullName ||
+    username === "" ||
+    password === "" ||
+    email === "" ||
+    fullName === ""
+  ) {
     next(errorHandler(400, "All fields are required"));
   }
   const newUser = new User({
     username,
+    fullName,
+    email,
     password: bcryptjs.hashSync(password, 10),
   });
 
   try {
-    const isUserExist = await User.findOne({ username });
+    const isUserExist = await User.findOne({
+      $or: [{ email }, { username }],
+    });
+    console.log(isUserExist, "isUserExist");
     if (isUserExist) {
-      next(errorHandler(409, "Username already exists"));
+      if (isUserExist.email === email) {
+        next(errorHandler(409, "Email already in use"));
+      }
+      if (isUserExist.username === username) {
+        next(
+          errorHandler(
+            409,
+            `${username} - username is already taken. Please choose another username.`
+          )
+        );
+      }
     }
+
     await newUser.save();
     res.json("Signup successful");
   } catch (error) {
