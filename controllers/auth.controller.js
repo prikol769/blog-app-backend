@@ -75,6 +75,7 @@ export const signin = async (req, res, next) => {
       {
         id: validUser._id,
         username: validUser.username,
+        fullName: validUser.fullName,
       },
       process.env.JWT_SECRET
     );
