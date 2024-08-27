@@ -60,8 +60,31 @@ export const getPosts = async (req, res, next) => {
   }
 };
 
+export const updatePostById = async (req, res, next) => {
+  if (req?.user?.id !== req.params?.userId) {
+    return next(errorHandler(403, "You are not allowed to update this post"));
+  }
+  try {
+    const updatedPost = await Post.findByIdAndUpdate(
+      req.params.postId,
+      {
+        $set: {
+          title: req.body.title,
+          content: req.body.content,
+          category: req.body.category,
+          summary: req.body.summary,
+        },
+      },
+      { new: true }
+    );
+    res.status(200).json(updatedPost);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const deletePostById = async (req, res, next) => {
-  if (req.user.id !== req.params.userId) {
+  if (req?.user?.id !== req.params?.userId) {
     return next(errorHandler(403, "You are not allowed to delete this post"));
   }
   try {
