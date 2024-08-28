@@ -60,6 +60,21 @@ export const getPosts = async (req, res, next) => {
   }
 };
 
+export const getPostsByUserId = async (req, res, next) => {
+  try {
+    const posts = await Post.find({ userId: req.params.userId });
+
+    const totalPosts = await Post.countDocuments();
+
+    res.status(200).json({
+      posts,
+      totalPosts,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const updatePostById = async (req, res, next) => {
   if (req?.user?.id !== req.params?.userId) {
     return next(errorHandler(403, "You are not allowed to update this post"));
