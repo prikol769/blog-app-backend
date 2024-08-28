@@ -18,6 +18,37 @@ export const signup = async (req, res, next) => {
   ) {
     next(errorHandler(400, "All fields are required"));
   }
+
+  if (req.body.username) {
+    if (req.body.username.length < 4) {
+      return next(errorHandler(400, "Username must be at least 4 characters"));
+    }
+    if (req.body.username.includes(" ")) {
+      return next(errorHandler(400, "Username cannot contain spaces"));
+    }
+
+    if (!req.body.username.match(/^[a-zA-Z0-9]+$/)) {
+      return next(
+        errorHandler(400, "Username can only contain letters and numbers")
+      );
+    }
+  }
+
+  if (req.body.email) {
+    if (req.body.email.length < 4) {
+      return next(errorHandler(400, "Email must be at least 4 characters"));
+    }
+    if (req.body.email.includes(" ")) {
+      return next(errorHandler(400, "Email cannot contain spaces"));
+    }
+  }
+
+  if (req.body.fullName) {
+    if (req.body.fullName.length < 4) {
+      return next(errorHandler(400, "Email must be at least 3 characters"));
+    }
+  }
+
   const newUser = new User({
     username,
     fullName,
@@ -29,7 +60,7 @@ export const signup = async (req, res, next) => {
     const isUserExist = await User.findOne({
       $or: [{ email }, { username }],
     });
-    console.log(isUserExist, "isUserExist");
+
     if (isUserExist) {
       if (isUserExist.email === email) {
         next(errorHandler(409, "Email already in use"));
