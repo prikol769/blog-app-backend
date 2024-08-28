@@ -43,11 +43,7 @@ export const getPosts = async (req, res, next) => {
   try {
     const startIndex = parseInt(req.query.startIndex) || 0;
     const limit = parseInt(req.query.limit) || 9;
-    const sortDirection = req.query.order === "asc" ? 1 : -1;
-    const posts = await Post.find({})
-      .sort({ updatedAt: sortDirection })
-      .skip(startIndex)
-      .limit(limit);
+    const posts = await Post.find({}).skip(startIndex).limit(limit);
 
     const totalPosts = await Post.countDocuments();
 
