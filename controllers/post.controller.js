@@ -43,7 +43,10 @@ export const getPosts = async (req, res, next) => {
   try {
     const startIndex = parseInt(req.query.startIndex) || 0;
     const limit = parseInt(req.query.limit) || 9;
-    const posts = await Post.find({}).skip(startIndex).limit(limit);
+    const posts = await Post.find({})
+      .sort({ updatedAt: -1 })
+      .skip(startIndex)
+      .limit(limit);
 
     const totalPosts = await Post.countDocuments();
 
@@ -58,7 +61,9 @@ export const getPosts = async (req, res, next) => {
 
 export const getPostsByUserId = async (req, res, next) => {
   try {
-    const posts = await Post.find({ userId: req.params.userId });
+    const posts = await Post.find({ userId: req.params.userId }).sort({
+      updatedAt: -1,
+    });
 
     const totalPosts = await Post.countDocuments();
 
