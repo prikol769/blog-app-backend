@@ -127,8 +127,6 @@ export const logout = (req, res, next) => {
 
 export const profile = (req, res) => {
   const { _blog_token } = req.cookies;
-  console.log(_blog_token, "_blog_token");
-  console.log(process.env.JWT_SECRET, "_process.env.JWT_SECRET");
 
   jwt.verify(_blog_token, process.env.JWT_SECRET, {}, (err, info) => {
     if (err) throw err;
