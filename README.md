@@ -25,7 +25,7 @@
 
 MK Blog is a dynamic and responsive blogging platform built with React.js, Material UI, and Tailwind CSS, Node.js, Express.js, MongoDB designed to provide users with a seamless experience for creating, editing, and managing blog posts and user accounts.
 
-## <a name="tech-stack">⚙️ Tech Stack (Frontend)</a>
+## <a name="tech-stack">⚙️ Tech Stack</a>
 
 - Vite
 - React
